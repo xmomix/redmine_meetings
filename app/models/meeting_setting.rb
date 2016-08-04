@@ -2,7 +2,7 @@ class MeetingSetting < ActiveRecord::Base
   belongs_to :project
 
   def self.find_or_create(pj_id)
-    setting = MeetingSetting.find(:first, :conditions => ['project_id = ?', pj_id])
+    setting = MeetingSetting.where('project_id = ?', pj_id).first
     unless setting
       setting = MeetingSetting.new
       setting.project_id = pj_id

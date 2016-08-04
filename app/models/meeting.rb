@@ -11,8 +11,7 @@ class Meeting < ActiveRecord::Base
 
   acts_as_watchable
 
-  acts_as_searchable :columns => ["#{table_name}.subject", "#{table_name}.description"],
-  :include => [:project]
+  acts_as_searchable :columns => ["#{table_name}.subject", "#{table_name}.description"]
 
   acts_as_event :title => Proc.new {|o| "#{l(:label_title_meeting)} ##{o.id}: #{format_time(o.start_date)} - #{o.subject}" },
   :description => Proc.new {|o| "#{o.description}"},
@@ -24,7 +23,7 @@ class Meeting < ActiveRecord::Base
   :timestamp => "#{table_name}.updated_on",
   :author_key => "#{table_name}.author_id",
   :permission => :view_meetings,
-  :find_options => {:joins => "LEFT JOIN #{Project.table_name} ON #{Project.table_name}.id = #{table_name}.project_id"}
+  :scope => {:joins => "LEFT JOIN #{Project.table_name} ON #{Project.table_name}.id = #{table_name}.project_id"}
 
   scope :visible, lambda {|*args| { :include => :project,
                                           :conditions => Project.allowed_to_condition(args.shift || User.current, :view_meetings, *args) } }
@@ -34,11 +33,11 @@ class Meeting < ActiveRecord::Base
   end
 
   def author
-    author_id ? User.find(:first, :conditions => "users.id = #{author_id}") : nil
+    author_id ? User.where("users.id = #{author_id}").first : nil
   end
 
   def project
-    Project.find(:first, :conditions => "projects.id = #{project_id}")
+    Project.where("projects.id = #{project_id}").first
   end
 
   def start_date_date

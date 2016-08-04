@@ -68,7 +68,10 @@ class MeetingsController < ApplicationController
     end
 
     meetings = []
-    meetings += Meeting.find(:all,:include => [ :author ], :conditions => ["(#{Meeting.table_name}.project_id = ?) AND ((start_date BETWEEN ? AND ?) OR (end_date BETWEEN ? AND ?))", @project.id, @calendar.startdt, @calendar.enddt, @calendar.startdt, @calendar.enddt])
+    meetings += Meeting.where("(#{Meeting.table_name}.project_id = ?) AND ((start_date BETWEEN ? AND ?) OR (end_date BETWEEN ? AND ?))",
+                              @project.id, @calendar.startdt, @calendar.enddt, @calendar.startdt, @calendar.enddt).
+        includes([ :author ]).
+        references([ :author ])
     @calendar.meetings = meetings
 
     render :action => 'index', :layout => false if request.xhr?
@@ -155,7 +158,9 @@ class MeetingsController < ApplicationController
 
   def export_meetings
     meetings = []
-    meetings += Meeting.find(:all,:include => [ :author ], :conditions => ["((start_date > ?) OR (end_date > ?))", DateTime.now, DateTime.now])
+    meetings += Meeting.where("((start_date > ?) OR (end_date > ?))", DateTime.now, DateTime.now).
+        includes([:author ]).
+        refenrences([:author ])
     download_ics_for(meetings)
   end
 

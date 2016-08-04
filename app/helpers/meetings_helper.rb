@@ -191,7 +191,7 @@ module MeetingsHelper
   def render_sidebar_doodles
     output = "".html_safe
     if User.current.allowed_to?(:view_meeting_doodles, @project, :global => false)
-      doodles = MeetingDoodle.find(:all, :conditions => "project_id = #{@project.id}", :order => "created_on DESC")
+      doodles = MeetingDoodle.where("project_id = #{@project.id}").order("created_on DESC")
       doodles.each do |doodle|
         output << "<br/>".html_safe
         output << link_to("-&nbsp;#{h(doodle.title)}".html_safe, {:controller => 'meetings', :action => 'show_doodle', :id => doodle.id, :project_id => @project, :only_path => true})

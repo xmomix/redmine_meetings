@@ -30,7 +30,7 @@ Redmine::Plugin.register :redmine_meetings do
   
   settings :default => {'bbb_server' => '', 'bbb_salt' => '', 'bbb_timeout' => '3', 'meeting_timezone' => 'Paris', 'bbb_recording' => ''}, :partial => 'meetings_settings/settings'
 
-  project_module :meetings do
+  project_module :redmine_meetings do
     permission :meetings_settings, {:meetings_settings => [:show, :update]}
     permission :view_meeting_doodles, {:meetings => [:show_doodle]}
     permission :manage_doodle, {:meetings => [:new_doodle, :create_doodle, :edit_doodle, :update_doodle, :delete_doodle, :preview_doodle]}
