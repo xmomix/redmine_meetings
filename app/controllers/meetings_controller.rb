@@ -453,14 +453,14 @@ class MeetingsController < ApplicationController
   end
 
   def find_doodle
-    @doodle = MeetingDoodle.find(params[:id], :include => [:project, :author, :responses])
+    @doodle = MeetingDoodle.find(params[:id])
     @project = @doodle.project
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_meeting
-    @meeting = Meeting.find(params[:id], :include => [:project, :author])
+    @meeting = Meeting.find(params[:id])
     @project = @meeting.project
   rescue ActiveRecord::RecordNotFound
     render_404
