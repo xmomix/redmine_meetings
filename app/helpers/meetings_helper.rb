@@ -161,6 +161,7 @@ module MeetingsHelper
           else
             meeting_tz = User.current.time_zone ? User.current.time_zone : ActiveSupport::TimeZone[Setting.plugin_redmine_meetings['meeting_timezone']]
             docRecord.root.elements['recordings'].each do |recording|
+              next if recording.is_a? REXML::Text
               dateRecord = Time.at(recording.elements['startTime'].text.to_i / 1000)
               dataFormated = meeting_tz.local_to_utc(dateRecord).strftime("%F %R")
               #dataFormated = Time.at(recording.elements['startTime'].text.to_i).strftime("%F %R")
