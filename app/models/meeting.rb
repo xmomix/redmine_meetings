@@ -11,19 +11,25 @@ class Meeting < ActiveRecord::Base
 
   acts_as_watchable
 
-  acts_as_searchable :columns => ["#{table_name}.subject", "#{table_name}.description"]
+  acts_as_searchable :columns => ["#{table_name}.subject", "#{table_name}.description"],
+		     :permission => :view_meetings,
+		     :scope => joins("LEFT JOIN #{Project.table_name} ON #{Project.table_name}.id = #{table_name}.project_id")
+
+#  acts_as_searchable :columns => ["#{table_name}.subject", "#{table_name}.description"],
+#                     :preload => :project
 
   acts_as_event :title => Proc.new {|o| "#{l(:label_title_meeting)} ##{o.id}: #{format_time(o.start_date)} - #{o.subject}" },
-  :description => Proc.new {|o| "#{o.description}"},
-  :datetime => :updated_on,
-  :type => 'meetings',
-  :url => Proc.new {|o| {:controller => 'meetings', :action => 'show_meeting', :id => o.id} }
+	  :description => Proc.new {|o| "#{o.description}"},
+	  :datetime => :updated_on,
+	  :type => 'meetings',
+	  :url => Proc.new {|o| {:controller => 'meetings', :action => 'show_meeting', :id => o.id} }
 
-  acts_as_activity_provider :type => 'meetings',
-  :timestamp => "#{table_name}.updated_on",
-  :author_key => "#{table_name}.author_id",
-  :permission => :view_meetings,
-  :scope => {:joins => "LEFT JOIN #{Project.table_name} ON #{Project.table_name}.id = #{table_name}.project_id"}
+  acts_as_activity_provider type: "meetings",
+          :timestamp => "#{table_name}.updated_on",
+	  :author_key => "#{table_name}.author_id",
+	  :permission => :view_meetings,
+	  :scope => joins("LEFT JOIN #{Project.table_name} ON #{Project.table_name}.id = #{table_name}.project_id") 
+
 
   scope :visible, lambda {|*args| { :include => :project,
                                           :conditions => Project.allowed_to_condition(args.shift || User.current, :view_meetings, *args) } }

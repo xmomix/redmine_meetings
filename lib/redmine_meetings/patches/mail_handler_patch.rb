@@ -31,7 +31,8 @@ module MeetingMailHandlerPatch
       project = doodle.project
       sender_email = email.from.to_a.first.to_s.strip
       if User.current.allowed_to?(:answer_doodle, project) && User.current.mail
-        response = doodle.responses.find_or_initialize_by_author_id(User.current.id)
+        #response = doodle.responses.find_or_initialize_by_author_id(User.current.id)
+        response = doodle.responses.find_or_initialize_by(:author => User.current)
         name = User.current.name
       else
         emails = doodle.tab_emails
@@ -40,7 +41,7 @@ module MeetingMailHandlerPatch
           emails.each do |em|
             if em.strip.casecmp(sender_email) == 0
               name = sender_email
-              response = doodle.responses.find_or_initialize_by_name(name)
+              response = doodle.responses.find_or_initialize_by(:name => name)
               response.author = User.anonymous
               found = true
             end
